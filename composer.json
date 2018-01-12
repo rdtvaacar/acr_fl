@@ -1,0 +1,19 @@
+{
+  "name": "acr/acr_fl",
+  "description": "Dosya Yükleme Sistemi",
+  "type": "laravel",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "acr",
+      "email": "acarbey15@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Acr\\Acr_fl\\": "src/"
+    }
+  },
+  "require": {}
+}
