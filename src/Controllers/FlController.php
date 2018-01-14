@@ -2,15 +2,232 @@
 
 namespace Acr\Acr_fl\Controllers;
 
-use Acr\File\Model\Acr_files;
-use Acr\File\Model\Acr_files_childs;
+use Acr\Acr_fl\Models\Acr_files_childs;
+use Acr\Acr_fl\Model\Acr_files;
+use Image;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Auth;
-use Zipper;
+use Illuminate\Support\Facades\Storage;
 
-class ImgControllers extends Controller
+
+class FlController extends Controller
 {
+    function acr_file_id()
+    {
+        $file_model = new Acr_files();
+        return $file_model->insertGetId(['updated_at' => date('Y-m-d')]);
+    }
+
+    function upload(Request $request)
+    {
+        $files       = $request->allFiles();
+        $acr_file_id = $request->acr_file_id;
+        foreach ($files as $file) {
+            return self::file_create($file, $acr_file_id);
+        }
+        return response()->json('data:1');
+    }
+
+    function css()
+    {
+        return view('Acr_flv::css')->render();
+    }
+
+    function form()
+    {
+        return view('Acr_flv::form')->render();
+    }
+
+    function js($data)
+    {
+        return view('Acr_flv::js', compact('data'))->render();
+    }
+
+    function file_create($file, $acr_file_id)
+    {
+        if (!empty($file)) {
+
+            $mime = $file->getMimeType();
+            if (!in_array($mime, self::allow_type())) {
+                return $mime;
+            }
+            $acr_files_model = new Acr_files_childs();
+            $file_name_dot   = $file->getClientOriginalName();
+            $dot             = $file->getClientOriginalExtension();
+            $file_name_org   = str_replace('.' . $dot, '', $file_name_dot);
+            $file_name       = self::ingilizceYap($file_name_org);
+
+            $file_size = $file->getClientSize();
+            if (file_exists(base_path() . '/storage/app/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
+                $file_name_org = $file_name_org . '_' . uniqid(rand(100000, 999999));
+            }
+            $path   = base_path() . '/storage/app/acr_files/' . $acr_file_id . '/';
+            $thumbs = $path . 'thumbs/';
+            $med    = $path . 'med/';
+            if (!is_dir(base_path() . '/storage/app/acr_files/')) {
+                mkdir(base_path() . '/storage/app/acr_files/');
+            }
+            if (!is_dir($path)) {
+                mkdir($path);
+            }
+            if (!is_dir($thumbs)) {
+                mkdir($thumbs);
+
+            }
+            if (!is_dir($med)) {
+                mkdir($med);
+
+            }
+
+            $img_mimes = [
+                'image/jpeg',
+                'image/png',
+                'image/gif'
+            ];
+            if (in_array($mime, $img_mimes)) {
+                Image::make($file)
+                    ->resize(180, 240, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })->save($thumbs . $file_name_org . '.' . $dot);
+                Image::make($file)
+                    ->resize(640, 480, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })->save($med . $file_name_org . '.' . $dot);
+                Image::make($file)
+                    ->resize(1920, 1080, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    })->save($path . $file_name_org . '.' . $dot);
+            } else {
+                $file_name = self::store_upload($file, $acr_file_id);
+            }
+            $data_file = [
+                'acr_file_id' => $acr_file_id,
+                'file_name_org' => $file_name_org,
+                'file_name' => $file_name,
+                'file_size' => $file_size,
+                'file_type' => $dot,
+            ];
+            $acr_files_model->insert($data_file);
+        }
+    }
+
+    function store_upload($file, $acr_file_id)
+    {
+        $path = $file->store('acr_files/' . $acr_file_id);
+
+        return $path;
+    }
+
+    function allow_type()
+    {
+        $data_type = [
+            "application/excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.ms-powerpoint",
+            "application/msword",
+            "application/pdf",
+            "application/vnd.ms-excel",
+            "application/x-gtar",
+            "application/x-gunzip",
+            "application/x-gzip",
+            "application/x-zip-compressed",
+            "application/zip",
+            "audio/TSP-audio",
+            "audio/basic",
+            "audio/basic",
+            "audio/midi",
+            "audio/mpeg",
+            "audio/ulaw",
+            "audio/x-aiff",
+            "audio/x-mpegurl",
+            "audio/x-ms-wax",
+            "audio/x-ms-wma",
+            "audio/x-pn-realaudio-plugin",
+            "audio/x-pn-realaudio",
+            "audio/x-realaudio",
+            "audio/x-wav",
+            "image/cmu-raster",
+            "image/gif",
+            "image/ief",
+            "image/tiff",
+            "image/jpeg",
+            "image/png",
+            "image/x-cmu-raster",
+            "image/x-portable-anymap",
+            "image/x-portable-bitmap",
+            "image/x-portable-graymap",
+            "image/x-portable-pixmap",
+            "image/x-rgb",
+            "image/x-xbitmap",
+            "image/x-xwindowdump",
+            "video/dl",
+            "video/fli",
+            "video/flv",
+            "video/gl",
+            "video/mpeg",
+            "video/mp4",
+            "video/mpeg",
+            "video/quicktime",
+            "video/vnd.vivo",
+            "video/x-fli",
+            "video/x-ms-asf",
+            "video/x-ms-asx",
+            "video/x-ms-wmv",
+            "video/x-msvideo",
+            "video/x-sgi-movie"
+        ];
+        return $data_type;
+    }
+
+    function ingilizceYap($url)
+    {
+        $url  = trim($url);
+        $url  = strtolower($url);
+        $find = array('<b>', '</b>');
+        $url  = str_replace($find, '', $url);
+        $url  = preg_replace('/<(\/{0,1})img(.*?)(\/{0,1})\>/', 'image', $url);
+
+        $find = array(' ', '&quot;', '&amp;', '&', '\r\n', '\n', '/', '\\', '+', '<', '>');
+        $url  = str_replace($find, '-', $url);
+
+        $find = array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ë', 'Ê');
+        $url  = str_replace($find, 'e', $url);
+
+        $find = array('í', 'ı', 'ì', 'î', 'ï', 'I', 'İ', 'Í', 'Ì', 'Î', 'Ï', 'İ');
+        $url  = str_replace($find, 'i', $url);
+
+        $find = array('ó', 'ö', 'Ö', 'ò', 'ô', 'Ó', 'Ò', 'Ô');
+        $url  = str_replace($find, 'o', $url);
+
+        $find = array('á', 'ä', 'â', 'à', 'â', 'Ä', 'Â', 'Á', 'À', 'Â');
+        $url  = str_replace($find, 'a', $url);
+
+        $find = array('ú', 'ü', 'Ü', 'ù', 'û', 'Ú', 'Ù', 'Û');
+        $url  = str_replace($find, 'u', $url);
+
+        $find = array('ç', 'Ç');
+        $url  = str_replace($find, 'c', $url);
+
+        $find = array('ş', 'Ş');
+        $url  = str_replace($find, 's', $url);
+
+        $find = array('ğ', 'Ğ');
+        $url  = str_replace($find, 'g', $url);
+
+        $find = array('/[^a-z0-9\-<>]/', '/[\-]+/', '/<[^>]*>/');
+        $repl = array('', '-', '');
+
+        $url = preg_replace($find, $repl, $url);
+        $url = str_replace('--', '-', $url);
+
+        return $url;
+    }
 
     function kaydet($acr_file_id, $session_id)
     {
@@ -52,8 +269,8 @@ class ImgControllers extends Controller
 
     function sil_childs($acr_child_file, $acr_file_id)
     {
-        $cf_fl_model = new Acr_files_childs();
-        $fl_model    = new Acr_files();
+        $cf_fl_model            = new Acr_files_childs();
+        $fl_model               = new Acr_files();
         $acr_files_childs_sorgu = $cf_fl_model->where('file_name', $acr_child_file)->where('acr_file_id', $acr_file_id);
         $sil                    = $acr_files_childs_sorgu->delete();
         if ($cf_fl_model->where('acr_file_id', $acr_file_id)->count() == 0) {
