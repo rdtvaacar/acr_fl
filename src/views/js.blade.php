@@ -2,13 +2,14 @@
     function fl_new() {
         $('#fl_form').show();
     }
+
     $(function () {
         // Variable to store your files
         var files;
         // Add events
         $('input[type=file]').on('change', prepareUpload);
 
-        $('form').on('submit', uploadFiles);
+        $('#fl_form_form').on('submit', uploadFiles);
 
         // Grab the files and set them to our variable
         function prepareUpload(event) {
