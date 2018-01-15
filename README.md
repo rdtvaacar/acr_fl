@@ -34,6 +34,12 @@ $fl_data = [
     'acr_file_id' => $acr_file_id,
 ]
 ```
+
+```php 
+{!! Acr_fl::get_file($acr_file_id, $file_name, $loc = '') !!}
+```
+Dosyayı basar
+
 ```php 
 {!! Acr_fl::files_list($acr_file_id) !!}
 ```
