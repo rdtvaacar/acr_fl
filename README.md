@@ -16,13 +16,7 @@ http://image.intervention.io/getting_started/installation
 ```
 'Acr_fl' => \Acr\Acr_fl\Facades\Acr_fl::class,
 ```
-### acr_file_id
 
-```php 
-PHP
-$acr_file_id = AcrFile::create($acr_file_id); 
-```
-acr_file_id: ilişkili tablodan gelmeli örneğin ürünler için kullanacaksanız urun tablonuzda acr_file_id stunu olmalı, acr_file_id değişkeni null gelirse : $acr_file_id = AcrFile::create($acr_file_id) yeni bir acr_file_id oluşturur.
 
 ```php
  {!! AcrFile::css() !!}  
@@ -40,7 +34,7 @@ $fl_data = [
     'acr_file_id' => $acr_file_id,
 ]
 ```
-acr_file_id gönderimi şarttır, ek data gönderilebilir.
+acr_file_id gönderimi şarttır, ek data gönderilebilir. İlişkili tablodan gelmeli örneğin ürünler için kullanacaksanız urun tablonuzda acr_file_id stunu olmalı, acr_file_id değişkeni null ise : $acr_file_id = Acr_fl::acr_file_id() yeni bir acr_file_id oluşturmanız ve ürünler tablosundaki acr_file_id stununa eklemeniz beklenmektedir.
 ```php 
 PHP
 {!! AcrFile::js($fl_data) !!}
