@@ -15,7 +15,7 @@ class FlController extends Controller
 {
     function views_image($acr_file_id, $file, $loc = '')
     {
-        $loc = empty($loc) ? '' : $loc . '/';
+        $loc = empty($loc) ? '/zero/' : '/' . $loc . '/';
         return view('Acr_flv::views_image', compact('file', 'acr_file_id', 'loc'));
     }
 
@@ -105,7 +105,8 @@ class FlController extends Controller
 
     function get_file($acr_file_id, $file_name, $loc = '')
     {
-        $loc  = empty($loc) ? '' : $loc . '/';
+        $loc = $loc == 'zero' ? '' : $loc . '/';
+
         $path = storage_path('app/public/acr_files/' . $acr_file_id . '/' . $loc . $file_name);
         return response()->file($path);
     }
