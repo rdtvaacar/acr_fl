@@ -9,10 +9,36 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Auth;
 use Illuminate\Support\Facades\Storage;
-
+use Response;
 
 class FlController extends Controller
 {
+    function file_header(Request $request, $file_name = null)
+    {
+        $acr_files_model = new Acr_files_childs();
+        if (empty($file_name)) {
+            $file_id = $request->file_id;
+            $file    = $acr_files_model->where('id', $file_id)->first();
+            $name    = $file->file_name;
+        } else {
+            $exp  = explode('/', $file_name);
+            $file = $acr_files_model->where('file_name', $file_name)->where('acr_file_id', $exp[1])->first();
+            $name = $file->file_name;
+        }
+        $path = storage_path('app/public/' . $name);
+        return response()->file($path);
+        return $response;
+    }
+
+    function download(Request $request)
+    {
+        $acr_files_model = new Acr_files_childs();
+        $file_id         = $request->file_id;
+        $file            = $acr_files_model->where('id', $file_id)->first();
+        $name            = $file->file_name;
+        return response()->download(storage_path('app/public/' . $name));
+    }
+
     function acr_file_id()
     {
         $file_model = new Acr_files();
@@ -23,10 +49,20 @@ class FlController extends Controller
     {
         $files       = $request->allFiles();
         $acr_file_id = $request->acr_file_id;
+        $file_names  = [];
         foreach ($files as $file) {
-            return self::file_create($file, $acr_file_id);
+            $file_names[] = self::file_create($file, $acr_file_id);
         }
-        return response()->json('data:1');
+        $json_data = "[";
+        foreach ($file_names as $key => $file_name) {
+            $file_name = $file_name;
+            $json_data .= '"' . $file_name . '"';
+            if (count($file_names) > $key + 1) {
+                $json_data .= ",";
+            }
+        }
+        $json_data .= "]";
+        return response()->json($json_data);
     }
 
     function css()
@@ -49,6 +85,7 @@ class FlController extends Controller
         if (!empty($file)) {
 
             $mime = $file->getMimeType();
+
             if (!in_array($mime, self::allow_type())) {
                 return $mime;
             }
@@ -59,14 +96,14 @@ class FlController extends Controller
             $file_name       = self::ingilizceYap($file_name_org);
 
             $file_size = $file->getClientSize();
-            if (file_exists(base_path() . '/storage/app/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
+            if (file_exists(base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
                 $file_name_org = $file_name_org . '_' . uniqid(rand(100000, 999999));
             }
-            $path   = base_path() . '/storage/app/acr_files/' . $acr_file_id . '/';
+            $path   = base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/';
             $thumbs = $path . 'thumbs/';
             $med    = $path . 'med/';
-            if (!is_dir(base_path() . '/storage/app/acr_files/')) {
-                mkdir(base_path() . '/storage/app/acr_files/');
+            if (!is_dir(base_path() . '/storage/app/public/acr_files/')) {
+                mkdir(base_path() . '/storage/app/public/acr_files/');
             }
             if (!is_dir($path)) {
                 mkdir($path);
@@ -101,6 +138,7 @@ class FlController extends Controller
                         $constraint->aspectRatio();
                         $constraint->upsize();
                     })->save($path . $file_name_org . '.' . $dot);
+                $file_name = 'acr_files/' . $acr_file_id . '/' . $file_name . '.' . $dot;
             } else {
                 $file_name = self::store_upload($file, $acr_file_id);
             }
@@ -110,14 +148,16 @@ class FlController extends Controller
                 'file_name' => $file_name,
                 'file_size' => $file_size,
                 'file_type' => $dot,
+                'mime' => $mime
             ];
             $acr_files_model->insert($data_file);
         }
+        return $file_name;
     }
 
     function store_upload($file, $acr_file_id)
     {
-        $path = $file->store('acr_files/' . $acr_file_id);
+        $path = $file->store('acr_files/' . $acr_file_id, 'public');
 
         return $path;
     }
