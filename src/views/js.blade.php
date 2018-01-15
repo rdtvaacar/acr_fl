@@ -140,4 +140,15 @@
             });
         }
     }
+
+    function fl_download(id) {
+        $.ajax({
+            type: 'post',
+            url: '/acr/fl/download',
+            data: 'file_id=' + id,
+            success: function (url) {
+                window.open(url);
+            }
+        });
+    }
 </script>

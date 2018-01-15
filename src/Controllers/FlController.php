@@ -13,6 +13,26 @@ use Response;
 
 class FlController extends Controller
 {
+    function views_image($acr_file_id, $file, $loc = '')
+    {
+        $loc = empty($loc) ? '' : $loc . '/';
+        return view('Acr_flv::views_image', compact('file', 'acr_file_id', 'loc'));
+    }
+
+    function views_galery($acr_file_id)
+    {
+        $acr_files_model = new Acr_files_childs();
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        return view('Acr_flv::views_galery', compact('files', 'acr_file_id'));
+    }
+
+    function views_list($acr_file_id)
+    {
+        $acr_files_model = new Acr_files_childs();
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        return view('Acr_flv::views_list', compact('files', 'acr_file_id'));
+    }
+
     function files_galery($acr_file_id)
     {
         $acr_files_model = new Acr_files_childs();
@@ -110,11 +130,13 @@ class FlController extends Controller
 
     function download(Request $request)
     {
-        $acr_files_model = new Acr_files_childs();
-        $file_id         = $request->file_id;
-        $file            = $acr_files_model->where('id', $file_id)->first();
-        $name            = $file->file_name;
-        return response()->download(storage_path('app/public/' . $file->acr_file_id . '/' . $name));
+        if (session()->token() == $request->token) {
+            $acr_files_model = new Acr_files_childs();
+            $file_id         = $request->file_id;
+            $file            = $acr_files_model->where('id', $file_id)->first();
+            $name            = $file->file_name;
+            return response()->download(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $name));
+        }
     }
 
     function acr_file_id()

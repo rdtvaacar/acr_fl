@@ -7,7 +7,7 @@ Route::group(['middleware' => ['web']], function () {
         Route::post('/file/delete', 'FlController@file_delete');
         Route::get('/acr/acr_fl/', 'FlController@upload');
         Route::post('/file_header', 'FlController@file_header');
-        Route::post('/download', 'FlController@download');
+        Route::get('/download', 'FlController@download');
         Route::group(['middleware' => ['auth']], function () {
         });
     });
