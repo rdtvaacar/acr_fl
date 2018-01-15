@@ -202,14 +202,14 @@ class FlController extends Controller
             $file_name       = self::ingilizceYap($file_name_org);
 
             $file_size = $file->getClientSize();
-            if (file_exists(base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
+            if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
-            $path   = base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/';
+            $path   = storage_path() . '/app/public/acr_files/' . $acr_file_id . '/';
             $thumbs = $path . 'thumbs/';
             $med    = $path . 'med/';
-            if (!is_dir(base_path() . '/storage/app/public/acr_files/')) {
-                mkdir(base_path() . '/storage/app/public/acr_files/');
+            if (!is_dir(storage_path() . '/app/public/acr_files/')) {
+                mkdir(storage_path() . '/app/public/acr_files/');
             }
             if (!is_dir($path)) {
                 mkdir($path);
