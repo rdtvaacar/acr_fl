@@ -189,7 +189,6 @@ class FlController extends Controller
     function file_create($file, $acr_file_id)
     {
         if (!empty($file)) {
-
             $mime = $file->getMimeType();
 
             if (!in_array($mime, self::allow_type())) {
