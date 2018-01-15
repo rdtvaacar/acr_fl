@@ -39,7 +39,7 @@ $fl_data = [
 ```
 Dosyaları Listeler
 ```php 
-{!! Acr_fl::files_gallery($acr_file_id) !!}
+{!! Acr_fl::files_galery($acr_file_id) !!}
 ```
 Dosyaları galeri şeklinde Listeler
 
