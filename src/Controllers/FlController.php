@@ -81,6 +81,11 @@ class FlController extends Controller
         return view('Acr_flv::form')->render();
     }
 
+    function form_one()
+    {
+        return view('Acr_flv::form_one')->render();
+    }
+
     function js($data)
     {
         return view('Acr_flv::js', compact('data'))->render();
