@@ -34,6 +34,14 @@ $fl_data = [
     'acr_file_id' => $acr_file_id,
 ]
 ```
+```php 
+{!! Acr_fl::files_list($acr_file_id) !!}
+```
+Dosyaları Listeler
+```php 
+{!! Acr_fl::files_gallery($acr_file_id) !!}
+```
+Dosyaları galeri şeklinde Listeler
 acr_file_id gönderimi şarttır, ek data gönderilebilir. İlişkili tablodan gelmeli örneğin ürünler için kullanacaksanız urun tablonuzda acr_file_id stunu olmalı, acr_file_id değişkeni null ise : $acr_file_id = Acr_fl::acr_file_id() yeni bir acr_file_id oluşturmanız ve ürünler tablosundaki acr_file_id stununa eklemeniz beklenmektedir.
 ```php 
 PHP
