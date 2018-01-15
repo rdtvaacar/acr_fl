@@ -13,6 +13,12 @@ use Response;
 
 class FlController extends Controller
 {
+    function get_file($acr_file_id, $file_name)
+    {
+        $path = storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file_name);
+        return response()->file($path);
+    }
+
     function file_header(Request $request, $file_name = null)
     {
         $acr_files_model = new Acr_files_childs();
@@ -25,7 +31,7 @@ class FlController extends Controller
             $file = $acr_files_model->where('file_name', $file_name)->where('acr_file_id', $exp[1])->first();
             $name = $file->file_name;
         }
-        $path = storage_path('app/public/' . $name);
+        $path = storage_path('app/public/' . $file->acr_file_id . '/' . $name);
         return response()->file($path);
         return $response;
     }
@@ -36,7 +42,7 @@ class FlController extends Controller
         $file_id         = $request->file_id;
         $file            = $acr_files_model->where('id', $file_id)->first();
         $name            = $file->file_name;
-        return response()->download(storage_path('app/public/' . $name));
+        return response()->download(storage_path('app/public/' . $file->acr_file_id . '/' . $name));
     }
 
     function acr_file_id()
@@ -97,7 +103,7 @@ class FlController extends Controller
 
             $file_size = $file->getClientSize();
             if (file_exists(base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
-                $file_name_org = $file_name_org . '_' . uniqid(rand(100000, 999999));
+                $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
             $path   = base_path() . '/storage/app/public/acr_files/' . $acr_file_id . '/';
             $thumbs = $path . 'thumbs/';
@@ -116,7 +122,6 @@ class FlController extends Controller
                 mkdir($med);
 
             }
-
             $img_mimes = [
                 'image/jpeg',
                 'image/png',
@@ -138,10 +143,11 @@ class FlController extends Controller
                         $constraint->aspectRatio();
                         $constraint->upsize();
                     })->save($path . $file_name_org . '.' . $dot);
-                $file_name = 'acr_files/' . $acr_file_id . '/' . $file_name . '.' . $dot;
+
             } else {
-                $file_name = self::store_upload($file, $acr_file_id);
+                self::store_upload($file, $acr_file_id);
             }
+            $file_name = $file_name . '.' . $dot;
             $data_file = [
                 'acr_file_id' => $acr_file_id,
                 'file_name_org' => $file_name_org,
@@ -152,14 +158,12 @@ class FlController extends Controller
             ];
             $acr_files_model->insert($data_file);
         }
-        return $file_name;
+        return $file_name_org . '.' . $dot;
     }
 
     function store_upload($file, $acr_file_id)
     {
-        $path = $file->store('acr_files/' . $acr_file_id, 'public');
-
-        return $path;
+        $file->store('acr_files/' . $acr_file_id, 'public');
     }
 
     function allow_type()
