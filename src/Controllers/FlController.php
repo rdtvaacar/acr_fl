@@ -13,11 +13,83 @@ use Response;
 
 class FlController extends Controller
 {
-    function get_file($acr_file_id, $file_name)
+    function files_galery($acr_file_id)
     {
-        $path = storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file_name);
+        $acr_files_model = new Acr_files_childs();
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        return view('Acr_flv::files_galery', compact('files', 'acr_file_id'));
+    }
+
+    function files_list($acr_file_id)
+    {
+        $acr_files_model = new Acr_files_childs();
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        return view('Acr_flv::files_list', compact('files', 'acr_file_id'));
+    }
+
+    function onizleme($type)
+    {
+        $type = strtolower($type);
+        switch ($type) {
+            case 'doc':
+            case 'docx':
+                $onizleme = '/icon/doc_2.png';
+                break;
+            case 'xls':
+            case 'xlsx':
+                $onizleme = '/icon/excel_2.png';
+                break;
+            case 'pdf':
+                $onizleme = '/icon/pdf_2.png';
+                break;
+            case 'mpg':
+            case 'mp4':
+            case 'm4a':
+            case 'ram':
+            case 'avi':
+            case 'asf':
+            case 'wma':
+            case 'wmv':
+            case 'wav':
+            case 'mid':
+            case 'ogg':
+            case 'flv':
+                $onizleme = '/icon/ClapBoard.png';
+                break;
+            case 'rar':
+            case 'zip':
+            case '7z':
+                $onizleme = '/icon/rar.png';
+                break;
+            case 'pptx':
+            case 'pps':
+            case 'ppt':
+                $onizleme = '/icon/ppt_2.png';
+                break;
+            case 'mp3':
+                $onizleme = '/icon/mp3.png';
+                break;
+        }
+        return @$onizleme;
+    }
+
+    function file_delete(Request $request)
+    {
+        $file_model = new Acr_files_childs();
+        $file       = $file_model->where('id', $request->id)->first();
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/thumbs/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/med/' . $file->file_name));
+        $file_model->where('id', $request->id)->delete();
+    }
+
+    function get_file($acr_file_id, $file_name, $loc = '')
+    {
+        $loc  = empty($loc) ? '' : $loc . '/';
+        $path = storage_path('app/public/acr_files/' . $acr_file_id . '/' . $loc . $file_name);
         return response()->file($path);
     }
+
 
     function file_header(Request $request, $file_name = null)
     {

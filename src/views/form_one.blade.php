@@ -6,7 +6,7 @@
     </div>
     <div style="display: none;" id="fl_complete" class="alert alert-success">Dosya başarıyla yüklendi</div>
     <div id="fl_form">
-        <input class="fileinput-button" name="files" type="file" id="files"/>
+        <input style="float: left;" class="fileinput-button" name="files" type="file" id="files"/>
         <button class="btn btn-danger btn-sm" type="submit">KAYDET</button>
     </div>
     <div id="fl_yuklenenler"></div>

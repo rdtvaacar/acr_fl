@@ -20,9 +20,7 @@
         function uploadFiles(event) {
             event.stopPropagation(); // Stop stuff happening
             event.preventDefault(); // Totally stop stuff happening
-
             // START A LOADING SPINNER HERE
-
             // Create a formdata object and add the files
             var data = new FormData();
             @foreach($data as $key=> $datum)
@@ -91,7 +89,6 @@
 
         }
 
-
         function submitForm(event, data) {
             // Create a jQuery object from the form
             $form = $(event.target);
@@ -103,7 +100,6 @@
             $.each(data.files, function (key, value) {
                 formData = formData + '&filenames[]=' + value;
             });
-
             $.ajax({
                 url: 'submit.php',
                 type: 'POST',
@@ -129,6 +125,19 @@
                 }
             });
         }
-    })
-    ;
+    });
+
+    function fl_file_delete(id) {
+        if (confirm('Silmek istediğinizden eminmisiniz?')) {
+            $.ajax({
+                type: 'post',
+                url: '/acr/fl/file/delete',
+                data: 'id=' + id,
+                success: function () {
+                    $('#fl_file_div_' + id).hide(400);
+                    $('#fl_file').show();
+                }
+            });
+        }
+    }
 </script>
