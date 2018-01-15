@@ -1,5 +1,5 @@
 #  LARAVEL - ACR FİLE 
-##Gerekli 
+## Gerekli 
 http://image.intervention.io/getting_started/installation
 ## Kurulum:
 #### composer json : 
