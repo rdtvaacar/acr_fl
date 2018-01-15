@@ -231,17 +231,17 @@ class FlController extends Controller
                     ->resize(180, 240, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
-                    })->save($thumbs . $file_name_org . '.' . $dot);
+                    })->save($thumbs . $file_name . '.' . $dot);
                 Image::make($file)
                     ->resize(640, 480, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
-                    })->save($med . $file_name_org . '.' . $dot);
+                    })->save($med . $file_name . '.' . $dot);
                 Image::make($file)
                     ->resize(1920, 1080, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
-                    })->save($path . $file_name_org . '.' . $dot);
+                    })->save($path . $file_name . '.' . $dot);
 
             } else {
                 self::store_upload($file, $acr_file_id);
