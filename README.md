@@ -1,4 +1,4 @@
-#  LARAVEL - ACR FİLE 
+#  LARAVEL - Acr_fl
 ## Gerekli 
 http://image.intervention.io/getting_started/installation
 ## Kurulum:
