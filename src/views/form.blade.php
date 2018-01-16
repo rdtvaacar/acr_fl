@@ -8,8 +8,9 @@
         <div class="btn btn-xs btn-success" onclick="fl_new()">Yeni dosyalar Ekle</div>
     </div>
     <div id="fl_form">
-        <input style="float: left"  class="fileinput-button" multiple="multiple" name="files" type="file" id="files"/>
+        <input style="float: left" class="fileinput-button " multiple="multiple" name="files" type="file" id="files"/>
         <button class="btn btn-danger btn-sm" type="submit">KAYDET</button>
     </div>
+    <div style="clear:both;"></div>
     <div id="fl_yuklenenler"></div>
 </form>

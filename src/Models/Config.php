@@ -5,7 +5,7 @@ namespace Acr\Acr_fl\Models;
 use Illuminate\Database\Eloquent\Model;
 use Auth;
 
-class Acr_files extends Model
+class Config extends Model
 
 {
     /**
@@ -14,6 +14,6 @@ class Acr_files extends Model
      * @var string
      */
     protected $options;
-
+    protected $table = 'Acr_fl_config';
 
 }

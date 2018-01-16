@@ -2,8 +2,9 @@
 
 namespace Acr\Acr_fl\Controllers;
 
+use Acr\Acr_fl\Models\Config;
 use Acr\Acr_fl\Models\Acr_files_childs;
-use Acr\Acr_fl\Model\Acr_files;
+use Acr\Acr_fl\Models\Acr_files;
 use Image;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,6 +14,35 @@ use Response;
 
 class FlController extends Controller
 {
+    function config_update(Request $request)
+    {
+        $config_model = new Config();
+        $data         = [
+            'thumbs_w' => $request->thumbs_w,
+            'thumbs_h' => $request->thumbs_h,
+            'med_w' => $request->med_w,
+            'med_h' => $request->med_h,
+            'orginal_w' => $request->orginal_w,
+            'orginal_h' => $request->orginal_h,
+            'crop_x' => $request->crop_x,
+            'crop_y' => $request->crop_y,
+            'crop_position' => $request->crop_position,
+            'watermark' => $request->watermark,
+            'watermark_position' => $request->watermark_position,
+            'font_size' => $request->font_size,
+            'color' => $request->color,
+        ];
+        $config_model->where('id', 1)->update($data);
+        return redirect()->back();
+    }
+
+    function config()
+    {
+        $config_model = new Config();
+        $config       = $config_model->first();
+        return view('Acr_flv::config', compact('config'));
+    }
+
     function views_image($acr_file_id, $file, $loc = '')
     {
         $loc = empty($loc) ? '/zero/' : '/' . $loc . '/';
@@ -188,6 +218,8 @@ class FlController extends Controller
 
     function file_create($file, $acr_file_id)
     {
+        $config_model = new Config();
+        $config       = $config_model->first();
         if (!empty($file)) {
             $mime = $file->getMimeType();
 
@@ -227,22 +259,74 @@ class FlController extends Controller
                 'image/gif'
             ];
             if (in_array($mime, $img_mimes)) {
-                Image::make($file)
-                    ->resize(180, 240, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    })->save($thumbs . $file_name . '.' . $dot);
-                Image::make($file)
-                    ->resize(640, 480, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    })->save($med . $file_name . '.' . $dot);
-                Image::make($file)
-                    ->resize(1920, 1080, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    })->save($path . $file_name . '.' . $dot);
 
+                $img_thumbs = Image::make($file)
+                    ->resize($config->thumbs_w, $config->thumbs_h, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $img_med    = Image::make($file)
+                    ->resize($config->med_w, $config->med_h, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                $img        = Image::make($file)->resize($config->orginal_w, $config->orginal_h, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+
+                foreach ([$img, $img_med] as $item) {
+                    if (!empty($config->watermark)) {
+                        $i_w       = $item->width();
+                        $i_h       = $item->height();
+                        $font_size = $config->font_size;
+                        $text      = $config->watermark;
+                        $color     = $config->color;
+                        $crop_x    = floor(($i_w / 100) * $config->crop_x);
+                        $crop_y    = floor(($i_h / 100) * $config->crop_y);
+                        $crop_x    = $crop_x == 0 ? 0 : -$crop_x;
+                        $crop_y    = $crop_y == 0 ? 0 : -$crop_y;
+                        if ($config->crop == 1) {
+                            $img_thumbs->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
+                            $img_med->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
+                            $img->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
+                        }
+
+                        switch ($config->watermark_position) {
+                            case 0;
+                                $ix  = ($i_w / 2) + ($font_size * 4.8);
+                                $i_h = ($i_w / 2) - 12;
+                                break;
+                            case 1;
+                                $ix  = 20 + ($font_size * 4.8);
+                                $i_h = 10 + $font_size;
+                                break;
+                            case 2;
+                                $ix  = ($i_w / 100) * 98;
+                                $i_h = 10 + $font_size;
+                                break;
+                            case 3;
+                                $ix  = ($i_w / 100) * 98;
+                                $i_h = ($i_h / 100) * 99;
+                                break;
+                            case 4;
+                                $ix  = 20 + ($font_size * 4.8);
+                                $i_h = ($i_h / 100) * 99;
+                                break;
+                        }
+                        $item->text($text, $ix, $i_h, function ($font) use ($font_size, $color) {
+                            $font->file(base_path('/public_html') . '/acr/fl/Righteous.ttf');
+                            $font->size($font_size);
+                            $font->color($color);
+                            $font->align('right');
+                            $font->valign('bottom');
+                            $font->angle(0);
+                        });
+                    }
+                }
+                $img_thumbs->save($thumbs . $file_name . '.' . $dot);;
+                $img_med->save($med . $file_name . '.' . $dot);
+                $img->save($path . $file_name . '.' . $dot);
             } else {
                 self::store_upload($file, $acr_file_id);
             }

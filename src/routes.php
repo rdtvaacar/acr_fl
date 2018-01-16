@@ -8,7 +8,10 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('/acr/acr_fl/', 'FlController@upload');
         Route::post('/file_header', 'FlController@file_header');
         Route::get('/download', 'FlController@download');
+        Route::get('/config', 'FlController@config');
+        Route::post('/config/update', 'FlController@config_update');
         Route::group(['middleware' => ['auth']], function () {
+
         });
     });
 });
