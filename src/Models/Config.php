@@ -14,6 +14,6 @@ class Config extends Model
      * @var string
      */
     protected $options;
-    protected $table = 'Acr_fl_config';
+    protected $table = 'acr_fl_config';
 
 }
