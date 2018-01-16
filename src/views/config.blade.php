@@ -1,6 +1,6 @@
 @extends('index')
 @section('acr_index')
-    <div class=" col-md-12" style="padding-top:50px ">
+    <div class=" col-md-12">
         <div class="box box-primary">
             <div class="box-header with-border">ACR FL CONFİG PAGE</div>
             <div class="box-body">
