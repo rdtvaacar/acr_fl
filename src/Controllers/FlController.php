@@ -27,6 +27,7 @@ class FlController extends Controller
             'crop_x' => $request->crop_x,
             'crop_y' => $request->crop_y,
             'crop_position' => $request->crop_position,
+            'crop' => $request->crop,
             'watermark' => $request->watermark,
             'watermark_position' => $request->watermark_position,
             'font_size' => $request->font_size,
@@ -270,11 +271,11 @@ class FlController extends Controller
                         $constraint->aspectRatio();
                         $constraint->upsize();
                     });
-                $img        = Image::make($file)->resize($config->orginal_w, $config->orginal_h, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-
+                $img        = Image::make($file)
+                    ->resize($config->orginal_w, $config->orginal_h, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
                 foreach ([$img, $img_med] as $item) {
                     if (!empty($config->watermark)) {
                         $i_w       = $item->width();
@@ -287,9 +288,7 @@ class FlController extends Controller
                         $crop_x    = $crop_x == 0 ? 0 : -$crop_x;
                         $crop_y    = $crop_y == 0 ? 0 : -$crop_y;
                         if ($config->crop == 1) {
-                            $img_thumbs->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
-                            $img_med->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
-                            $img->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
+                            $item->resizeCanvas($crop_x, $crop_y, $config->crop_position, true);
                         }
 
                         switch ($config->watermark_position) {
@@ -302,11 +301,11 @@ class FlController extends Controller
                                 $i_h = 10 + $font_size;
                                 break;
                             case 2;
-                                $ix  = ($i_w / 100) * 98;
+                                $ix  = ($i_w / 100) * 99 - ($font_size);
                                 $i_h = 10 + $font_size;
                                 break;
                             case 3;
-                                $ix  = ($i_w / 100) * 98;
+                                $ix  = ($i_w / 100) * 90 - ($font_size);
                                 $i_h = ($i_h / 100) * 99;
                                 break;
                             case 4;
