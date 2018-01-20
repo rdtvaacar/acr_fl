@@ -17,7 +17,7 @@ class Acr_flServiceProvider extends ServiceProvider
         require __DIR__ . "/routes.php";
         $this->loadViewsFrom(__DIR__ . '/views', 'Acr_flv');
         $this->publishes([
-            __DIR__ . '/Public/Fonts/' => base_path('/public_html/acr/fl/'),
+            __DIR__ . '/Public/' => base_path('/public_html/acr/fl/'),
         ], 'public');
     }
 

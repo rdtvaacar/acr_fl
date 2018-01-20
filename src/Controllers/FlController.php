@@ -207,6 +207,16 @@ class FlController extends Controller
         return view('Acr_flv::form')->render();
     }
 
+    function galery_css()
+    {
+        return view('Acr_flv::galery_css')->render();
+    }
+
+    function galery_js()
+    {
+        return view('Acr_flv::galery_js')->render();
+    }
+
     function form_one()
     {
         return view('Acr_flv::form_one')->render();
