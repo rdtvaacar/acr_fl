@@ -16,8 +16,10 @@ http://image.intervention.io/getting_started/installation
 ```
 'Acr_fl' => \Acr\Acr_fl\Facades\Acr_fl::class,
 ```
-
-
+```php
+php artisan vendor:publish --tag=public --force
+```
+# Public Dizinine dosyaları koyar
 ```php
  {!! AcrFile::css() !!}  
 ```
@@ -38,7 +40,7 @@ $fl_data = [
 ```php 
 {!! Acr_fl::get_file($acr_file_id, $file_name, $loc = '') !!}
 ```
-Dosyayı basar
+ Dosyayı basar
 
 ```php 
 {!! Acr_fl::files_list($acr_file_id) !!}
@@ -47,7 +49,15 @@ Dosyaları Listeler
 ```php 
 {!! Acr_fl::files_galery($acr_file_id) !!}
 ```
-Dosyaları galeri şeklinde Listeler
+
+```php 
+{!! Acr_fl::views_image($acr_file_id) !!}
+```
+Dosyayı Gösterir
+```php 
+{!! Acr_fl::views_galery($acr_file_id) !!}
+```
+Galeriyi Gösterir
 
 acr_file_id gönderimi şarttır, ek data gönderilebilir. İlişkili tablodan gelmeli örneğin ürünler için kullanacaksanız urun tablonuzda acr_file_id stunu olmalı, acr_file_id değişkeni null ise : $acr_file_id = Acr_fl::acr_file_id() yeni bir acr_file_id oluşturmanız ve ürünler tablosundaki acr_file_id stununa eklemeniz beklenmektedir.
 ```php 
