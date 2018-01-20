@@ -9,7 +9,6 @@ use Image;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Auth;
-use Illuminate\Support\Facades\Storage;
 use Response;
 
 class FlController extends Controller
@@ -50,33 +49,39 @@ class FlController extends Controller
         return view('Acr_flv::views_image', compact('file', 'acr_file_id', 'loc'));
     }
 
-    function views_galery($acr_file_id)
+    function views_galery($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::views_galery', compact('files', 'acr_file_id'));
     }
 
-
-
-    function views_list($acr_file_id)
+    function views_list($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::views_list', compact('files', 'acr_file_id'));
     }
 
-    function files_galery($acr_file_id)
+    function files_galery($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::files_galery', compact('files', 'acr_file_id'));
     }
 
-    function files_list($acr_file_id)
+    function files_list($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::files_list', compact('files', 'acr_file_id'));
     }
 
