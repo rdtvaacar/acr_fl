@@ -9,7 +9,7 @@
                     <img class="img-thumbnail" src="{!! $img !!}"/>
                 </a>
             @elseif(in_array($file->file_type,['mp4','vma','mpg','flv','mov','avi']))
-                <a href="{{$img_zero}}"
+                <a href="{{$img_zero}"
                    type="video/{{$file->file_type}}"
                    data-poster="/img/takla.png"
                    data-sources='[{"href": "{{$img}}"}]'>
