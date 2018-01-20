@@ -5,6 +5,7 @@ http://image.intervention.io/getting_started/installation
 #### composer json : 
 ```
 "acr/acr_fl": "dev-fl"
+"acr/acr_fl": "dev-flg" // with bluimpgalery
 ```
 
 
