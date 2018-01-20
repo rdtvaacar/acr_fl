@@ -9,7 +9,7 @@
         // Add events
         $('input[type=file]').on('change', prepareUpload);
 
-        $('#fl_form_form').on('submit', uploadFiles);
+        $('.fl_form').on('submit', uploadFiles);
 
         // Grab the files and set them to our variable
         function prepareUpload(event) {
@@ -60,8 +60,8 @@
                                 $("<ul/>", {
                                     "class": "lf_list",
                                     html: items.join("")
-                                }).appendTo("#fl_yuklenenler");
-                                $('#fl_yuklenenler').show();
+                                }).appendTo(".fl_yuklenenler");
+                                $('.fl_yuklenenler').show();
                             }
                             else {
                                 var items = [];
@@ -71,8 +71,8 @@
                                 $("<ul/>", {
                                     "class": "lf_list",
                                     html: items.join("")
-                                }).appendTo("#fl_yuklenenler");
-                                $('#fl_yuklenenler').show();
+                                }).appendTo(".fl_yuklenenler");
+                                $('.fl_yuklenenler').show();
                                 console.log('ERRORS: ' + data.error);
                             }
                         },
