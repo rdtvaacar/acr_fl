@@ -57,6 +57,8 @@ class FlController extends Controller
         return view('Acr_flv::views_galery', compact('files', 'acr_file_id'));
     }
 
+
+
     function views_list($acr_file_id)
     {
         $acr_files_model = new Acr_files_childs();
