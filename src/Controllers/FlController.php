@@ -7,7 +7,7 @@ use Acr\Acr_fl\Models\Acr_files_childs;
 use Acr\Acr_fl\Models\Acr_files;
 use Image;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+//use Illuminate\Routing\Controller;
 use Auth;
 use Response;
 
@@ -174,6 +174,8 @@ class FlController extends Controller
             $file_id         = $request->file_id;
             $file            = $acr_files_model->where('id', $file_id)->first();
             $name            = $file->file_name;
+            $indirme         = $file->indirme + 1;
+            $acr_files_model->where('id', $file_id)->update(['indirme' => $indirme]);
             return response()->download(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $name));
         }
     }
@@ -331,7 +333,7 @@ class FlController extends Controller
                                 break;
                         }
                         $item->text($text, $ix, $i_h, function ($font) use ($font_size, $color) {
-                            $font->file(base_path('/public_html') . '/acr/fl/Righteous.ttf');
+                            $font->file(base_path('/public_html') . '/acr/fl/Fonts/Righteous.ttf');
                             $font->size($font_size);
                             $font->color($color);
                             $font->align('right');
