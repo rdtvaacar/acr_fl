@@ -7,7 +7,7 @@ use Acr\Acr_fl\Models\Acr_files_childs;
 use Acr\Acr_fl\Models\Acr_files;
 use Image;
 use Illuminate\Http\Request;
-//use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controller;
 use Auth;
 use Response;
 
