@@ -22,12 +22,12 @@ php artisan vendor:publish --tag=public --force
 ```
 # Public Dizinine dosyaları koyar
 ```php
- {!! AcrFile::css() !!}  
+ {!! Acr_fl::css() !!}  
 ```
 CSS dosyalarını yükler.
 ```php 
 PHP
-{!! AcrFile::form() !!}
+{!! Acr_fl::form() !!}
 ```
 Formu yükler
 ```php 
@@ -63,7 +63,7 @@ Galeriyi Gösterir
 acr_file_id gönderimi şarttır, ek data gönderilebilir. İlişkili tablodan gelmeli örneğin ürünler için kullanacaksanız urun tablonuzda acr_file_id stunu olmalı, acr_file_id değişkeni null ise : $acr_file_id = Acr_fl::acr_file_id() yeni bir acr_file_id oluşturmanız ve ürünler tablosundaki acr_file_id stununa eklemeniz beklenmektedir.
 ```php 
 PHP
-{!! AcrFile::js($fl_data) !!}
+{!! Acr_fl::js($fl_data) !!}
 ```
 Java script dosylarını yükler.
 
