@@ -95,6 +95,7 @@ class FlController extends Controller
                 break;
             case 'xls':
             case 'xlsx':
+            case 'xlsm':
                 $onizleme = '/icon/excel_2.png';
                 break;
             case 'pdf':
@@ -370,6 +371,7 @@ class FlController extends Controller
     function allow_type()
     {
         $data_type = [
+            "image/svg+xml",
             "application/excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
