@@ -5,19 +5,25 @@
             $img_zero = '/acr/fl/get_file/' . $acr_file_id . '/' . $file->file_name . '/zero';
             ?>
             @if(in_array($file->mime,['image/jpeg', 'image/png', 'image/gif']))
-                <a href="{{$img_zero}}">
-                    <img class="img-thumbnail" src="{!! $img !!}"/>
-                </a>
+                @if (in_array($type,[1,4]))
+                    <a href="{{$img_zero}}">
+                        <img @if(!empty($w)) width="{{$w}}" @endif class="img-thumbnail" src="{!! $img !!}"/>
+                    </a>
+                @endif
             @elseif(in_array($file->file_type,['mp4','vma','mpg','flv','mov','avi']))
-                <a href="{{$img_zero}}"
-                   type="video/{{$file->file_type}}"
-                   data-poster="/img/takla.png"
-                   data-sources='[{"href": "{{$img}}"}]'>
-                    <img width="180" src="/img/takla.png"/>
-                </a>
+                @if (in_array($type,[2,4]))
+                    <a href="{{$img_zero}}"
+                       type="video/{{$file->file_type}}"
+                       data-poster="/img/takla.png"
+                       data-sources='[{"href": "{{$img}}"}]'>
+                        <img @if(!empty($w)) width="{{$w}}" @else  width="180" @endif src="/img/takla.png"/>
+                    </a>
+                @endif
             @else
-                <?php $img = Acr_fl::onizleme($file->file_type); ?>
-                <img class="img-thumbnail" src="{!! $img !!}"/>
+                @if (in_array($type,[3,4]))
+                    <?php $img = Acr_fl::onizleme($file->file_type); ?>
+                    <img @if(!empty($w)) width="{{$w}}" @endif class="img-thumbnail" src="{!! $img !!}"/>
+                @endif
             @endif
         </div>
     @endforeach

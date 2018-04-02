@@ -49,13 +49,14 @@ class FlController extends Controller
         return view('Acr_flv::views_image', compact('file', 'acr_file_id', 'loc'));
     }
 
-    function views_galery($acr_file_id, $files = null)
+    function views_galery($acr_file_id, $files = null, $w = null, $type = null) // w = thumb width type = 1 =>yalnızca resimler  2 video ve resimler 3 yalnıca dosyalar 4 =>hepsi
     {
         $acr_files_model = new Acr_files_childs();
+        $type            = empty($type) ? 4 : $type;
         if (empty($files)) {
             $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
         }
-        return view('Acr_flv::views_galery', compact('files', 'acr_file_id'));
+        return view('Acr_flv::views_galery', compact('files', 'acr_file_id', 'w', 'type'));
     }
 
     function views_list($acr_file_id, $files = null)
