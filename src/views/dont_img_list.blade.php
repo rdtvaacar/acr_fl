@@ -5,18 +5,12 @@
         <th>ID</th>
         <th>İNDİR</th>
         <th>İSİM</th>
-
         <th>BOYUT</th>
-
     </tr>
     </thead>
     <tbody>
     @foreach($files as $file)
-        @if(in_array($file->mime,['image/jpg', 'image/gif', 'image/png', 'image/web', 'image/svg+xml', 'image/jpeg']))
-            <?php $img = '/acr/fl/get_file/' . $acr_file_id . '/' . $file->file_name . '/thumbs'; ?>
-        @else
-            <?php $img = Acr_fl::onizleme($file->file_type); ?>
-        @endif
+        <?php $img = Acr_fl::onizleme($file->file_type); ?>
         <tr id="fl_file_div_{{$file->id}}">
             <td><img style="width:36px;" class="img-thumbnail" src="{!! $img !!}"/></td>
             <td>{{$file->id}}</td>

@@ -65,7 +65,16 @@ class FlController extends Controller
         if (empty($files)) {
             $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
         }
-        return view('Acr_flv::views_list', compact('files', 'acr_file_id'));
+        return view('Acr_flv::views_list', compact('files', 'acr_file_id', 'type'));
+    }
+
+    function dont_img_list($acr_file_id, $files = null)
+    {
+        $acr_files_model = new Acr_files_childs();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->whereNotIn('mime', ['image/jpg', 'image/gif', 'image/png', 'image/web', 'image/svg+xml', 'image/jpeg'])->get();
+        }
+        return view('Acr_flv::dont_img_list', compact('files', 'acr_file_id', 'type'));
     }
 
     function files_galery($acr_file_id, $files = null)
@@ -408,6 +417,7 @@ class FlController extends Controller
             "image/jpeg",
             "image/png",
             "image/x-cmu-raster",
+            "image/svg+xml",
             "image/x-portable-anymap",
             "image/x-portable-bitmap",
             "image/x-portable-graymap",
