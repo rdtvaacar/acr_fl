@@ -95,7 +95,6 @@ class FlController extends Controller
                 break;
             case 'xls':
             case 'xlsx':
-            case 'xlsm':
                 $onizleme = '/icon/excel_2.png';
                 break;
             case 'pdf':
@@ -346,10 +345,13 @@ class FlController extends Controller
                 $img_thumbs->save($thumbs . $file_name . '.' . $dot);;
                 $img_med->save($med . $file_name . '.' . $dot);
                 $img->save($path . $file_name . '.' . $dot);
+                $file_name = $file_name . '.' . $dot;
             } else {
-                self::store_upload($file, $acr_file_id);
+                $file_name = self::store_upload($file, $acr_file_id);
+                $file_name = str_replace("acr_files/$acr_file_id/", '', $file_name);
+
             }
-            $file_name = $file_name . '.' . $dot;
+
             $data_file = [
                 'acr_file_id' => $acr_file_id,
                 'file_name_org' => $file_name_org,
@@ -360,18 +362,17 @@ class FlController extends Controller
             ];
             $acr_files_model->insert($data_file);
         }
-        return $file_name_org . '.' . $dot;
+        return $file_name;
     }
 
     function store_upload($file, $acr_file_id)
     {
-        $file->store('acr_files/' . $acr_file_id, 'public');
+        return $file->store('acr_files/' . $acr_file_id, 'public');
     }
 
     function allow_type()
     {
         $data_type = [
-            "image/svg+xml",
             "application/excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
