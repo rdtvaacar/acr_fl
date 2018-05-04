@@ -21,7 +21,7 @@ class FlController extends Controller
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/thumbs/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/med/' . $file->file_name));
-        $file_model->where('id', $request->id)->delete();
+        $file_model->where('acr_file_id', $acr_file_id)->delete();
     }
 
     function config_update(Request $request)
@@ -272,17 +272,17 @@ class FlController extends Controller
             if (in_array($mime, $img_mimes)) {
 
                 $img_thumbs = Image::make($file)->resize($config->thumbs_w, $config->thumbs_h, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
                 $img_med    = Image::make($file)->resize($config->med_w, $config->med_h, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
                 $img        = Image::make($file)->resize($config->orginal_w, $config->orginal_h, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
                 foreach ([
                              $img,
                              $img_med
