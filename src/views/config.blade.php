@@ -1,4 +1,4 @@
-@extends('index')
+@extends('acr_fl.index')
 @section('acr_index')
     <div class=" col-md-12">
         <div class="box box-primary">

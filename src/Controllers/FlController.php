@@ -9,19 +9,22 @@ use Image;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Auth;
-use Illuminate\Support\Facades\Storage;
 use Response;
 
 class FlController extends Controller
 {
-    function acr_file_delete($acr_file_id)
+    function post_file_delete(Request $request)
     {
-        $file_model = new Acr_files_childs();
-        $file       = $file_model->where('acr_file_id', $acr_file_id)->first();
-        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file->file_name));
-        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/thumbs/' . $file->file_name));
-        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/med/' . $file->file_name));
-        $file_model->where('acr_file_id', $acr_file_id)->delete();
+        $acr_file_id = $request->acr_file_id;
+        $this->acr_file_delete($acr_file_id);
+    }
+
+    function file_uploader(Request $request)
+    {
+        $acr_file_id = $request->acr_file_id;
+        $file        = $request->file('file');
+        $this->acr_file_delete($acr_file_id);
+        return $this->file_create($file, $acr_file_id);
     }
 
     function config_update(Request $request)
@@ -60,31 +63,56 @@ class FlController extends Controller
         return view('Acr_flv::views_image', compact('file', 'acr_file_id', 'loc'));
     }
 
-    function views_galery($acr_file_id)
+    function views_galery($acr_file_id, $files = null, $w = null, $type = null) // w = thumb width type = 1 =>yalnızca resimler  2 video ve resimler 3 yalnıca dosyalar 4 =>hepsi
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
-        return view('Acr_flv::views_galery', compact('files', 'acr_file_id'));
+        $type            = empty($type) ? 4 : $type;
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
+        return view('Acr_flv::views_galery', compact('files', 'acr_file_id', 'w', 'type'));
     }
 
-    function views_list($acr_file_id)
+    function views_list($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
-        return view('Acr_flv::views_list', compact('files', 'acr_file_id'));
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
+        return view('Acr_flv::views_list', compact('files', 'acr_file_id', 'type'));
     }
 
-    function files_galery($acr_file_id)
+    function dont_img_list($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->whereNotIn('mime', [
+                'image/jpg',
+                'image/gif',
+                'image/png',
+                'image/web',
+                'image/svg+xml',
+                'image/jpeg'
+            ])->get();
+        }
+        return view('Acr_flv::dont_img_list', compact('files', 'acr_file_id', 'type'));
+    }
+
+    function files_galery($acr_file_id, $files = null)
+    {
+        $acr_files_model = new Acr_files_childs();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::files_galery', compact('files', 'acr_file_id'));
     }
 
-    function files_list($acr_file_id)
+    function files_list($acr_file_id, $files = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        if (empty($files)) {
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+        }
         return view('Acr_flv::files_list', compact('files', 'acr_file_id'));
     }
 
@@ -170,6 +198,16 @@ class FlController extends Controller
         return $response;
     }
 
+    function acr_file_delete($acr_file_id)
+    {
+        $file_model = new Acr_files_childs();
+        $file       = $file_model->where('acr_file_id', $acr_file_id)->first();
+        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/thumbs/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/med/' . $file->file_name));
+        $file_model->where('acr_file_id', $acr_file_id)->delete();
+    }
+
     function download(Request $request)
     {
         if (session()->token() == $request->token) {
@@ -177,6 +215,8 @@ class FlController extends Controller
             $file_id         = $request->file_id;
             $file            = $acr_files_model->where('id', $file_id)->first();
             $name            = $file->file_name;
+            $indirme         = $file->indirme + 1;
+            $acr_files_model->where('id', $file_id)->update(['indirme' => $indirme]);
             return response()->download(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $name));
         }
     }
@@ -217,6 +257,16 @@ class FlController extends Controller
         return view('Acr_flv::form')->render();
     }
 
+    function galery_css()
+    {
+        return view('Acr_flv::galery_css')->render();
+    }
+
+    function galery_js()
+    {
+        return view('Acr_flv::galery_js')->render();
+    }
+
     function form_one()
     {
         return view('Acr_flv::form_one')->render();
@@ -233,7 +283,6 @@ class FlController extends Controller
         $config       = $config_model->first();
         if (!empty($file)) {
             $mime = $file->getMimeType();
-
             if (!in_array($mime, self::allow_type())) {
                 return $mime;
             }
@@ -242,8 +291,7 @@ class FlController extends Controller
             $dot             = $file->getClientOriginalExtension();
             $file_name_org   = str_replace('.' . $dot, '', $file_name_dot);
             $file_name       = self::ingilizceYap($file_name_org);
-
-            $file_size = $file->getClientSize();
+            $file_size       = $file->getClientSize();
             if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
@@ -283,11 +331,12 @@ class FlController extends Controller
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });
-                foreach ([
-                             $img,
-                             $img_med
-                         ] as $item) {
-                    if (!empty($config->watermark)) {
+                if (!empty($config->watermark)) {
+                    foreach ([
+                        $img,
+                        $img_med
+                    ] as $item
+                    ) {
                         $i_w       = $item->width();
                         $i_h       = $item->height();
                         $font_size = $config->font_size;
@@ -324,7 +373,7 @@ class FlController extends Controller
                                 break;
                         }
                         $item->text($text, $ix, $i_h, function ($font) use ($font_size, $color) {
-                            $font->file(base_path('/public_html') . '/acr/fl/Righteous.ttf');
+                            $font->file(base_path('/public_html') . '/acr/fl/Fonts/Righteous.ttf');
                             $font->size($font_size);
                             $font->color($color);
                             $font->align('right');
@@ -336,10 +385,13 @@ class FlController extends Controller
                 $img_thumbs->save($thumbs . $file_name . '.' . $dot);;
                 $img_med->save($med . $file_name . '.' . $dot);
                 $img->save($path . $file_name . '.' . $dot);
+                $file_name = $file_name . '.' . $dot;
+
             } else {
-                self::store_upload($file, $acr_file_id);
+                $file_name = self::store_upload($file, $acr_file_id);
+                $file_name = str_replace("acr_files/$acr_file_id/", '', $file_name);
+
             }
-            $file_name = $file_name . '.' . $dot;
             $data_file = [
                 'acr_file_id'   => $acr_file_id,
                 'file_name_org' => $file_name_org,
@@ -350,12 +402,12 @@ class FlController extends Controller
             ];
             $acr_files_model->insert($data_file);
         }
-        return $file_name_org . '.' . $dot;
+        return $file_name;
     }
 
     function store_upload($file, $acr_file_id)
     {
-        $file->store('acr_files/' . $acr_file_id, 'public');
+        return $file->store('acr_files/' . $acr_file_id, 'public');
     }
 
     function allow_type()
@@ -395,6 +447,7 @@ class FlController extends Controller
             "image/jpeg",
             "image/png",
             "image/x-cmu-raster",
+            "image/svg+xml",
             "image/x-portable-anymap",
             "image/x-portable-bitmap",
             "image/x-portable-graymap",
