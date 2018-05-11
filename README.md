@@ -37,7 +37,10 @@ $fl_data = [
     'acr_file_id' => $acr_file_id,
 ]
 ```
-
+Download
+```php
+<a href="/acr/fl/download?file_id={{$data->id}}&token={{csrf_token()}}">İNDİR</a>
+```
 ```php 
 {!! Acr_fl::get_file($acr_file_id, $file_name, $loc = '') !!}
 ```
