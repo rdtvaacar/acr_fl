@@ -7,12 +7,28 @@ use Acr\Acr_fl\Models\Acr_files_childs;
 use Acr\Acr_fl\Models\Acr_files;
 use Image;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use Auth;
 use Response;
 
 class FlController extends Controller
 {
+    function delete_all(Request $request)
+    {
+        $acr_file_id = $request->acr_file_id;
+        $file_model  = new Acr_files();
+        $child_model = new Acr_files_childs();
+        $file_model->where('id', $acr_file_id)->delete();
+        $files = $child_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->get();
+        foreach ($files as $file) {
+            @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $file->file_name));
+            @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/thumbs/' . $file->file_name));
+            @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/med/' . $file->file_name));
+        }
+        $child_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->delete();
+        return redirect()->back()->with('msg', $this->basarili());
+    }
+
     function post_file_delete(Request $request)
     {
         $acr_file_id = $request->acr_file_id;
@@ -111,7 +127,7 @@ class FlController extends Controller
     {
         $acr_files_model = new Acr_files_childs();
         if (empty($files)) {
-            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->get();
+            $files = $acr_files_model->where('acr_file_id', $acr_file_id)->orderBy('id', 'desc')->paginate(10);
         }
         return view('Acr_flv::files_list', compact('files', 'acr_file_id'));
     }
@@ -164,12 +180,14 @@ class FlController extends Controller
 
     function file_delete(Request $request)
     {
-        $file_model = new Acr_files_childs();
-        $file       = $file_model->where('id', $request->id)->first();
+        $acr_file_model = new Acr_files();
+        $file_model     = new Acr_files_childs();
+        $file           = $file_model->where('id', $request->id)->first();
+        $acr_file_model->where('id', $file->acr_file_id)->delete();
         @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/thumbs/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/med/' . $file->file_name));
-        $file_model->where('id', $request->id)->delete();
+        $file_model->where('id', $request->id)->where('user_id', Auth::user()->id)->delete();
     }
 
     function get_file($acr_file_id, $file_name, $loc = '')
@@ -200,12 +218,14 @@ class FlController extends Controller
 
     function acr_file_delete($acr_file_id)
     {
-        $file_model = new Acr_files_childs();
-        $file       = $file_model->where('acr_file_id', $acr_file_id)->first();
+        $file_model     = new Acr_files_childs();
+        $acr_file_model = new Acr_files();
+        $acr_file_model->where('id', $acr_file_id)->delete();
+        $file = $file_model->where('acr_file_id', $acr_file_id)->first();
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/thumbs/' . $file->file_name));
         @unlink(storage_path('app/public/acr_files/' . $acr_file_id . '/med/' . $file->file_name));
-        $file_model->where('acr_file_id', $acr_file_id)->delete();
+        $file_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->delete();
     }
 
     function download(Request $request)
@@ -333,10 +353,9 @@ class FlController extends Controller
                 });
                 if (!empty($config->watermark)) {
                     foreach ([
-                        $img,
-                        $img_med
-                    ] as $item
-                    ) {
+                                 $img,
+                                 $img_med
+                             ] as $item) {
                         $i_w       = $item->width();
                         $i_h       = $item->height();
                         $font_size = $config->font_size;
@@ -394,6 +413,7 @@ class FlController extends Controller
             }
             $data_file = [
                 'acr_file_id'   => $acr_file_id,
+                'user_id'       => Auth::user()->id,
                 'file_name_org' => $file_name_org,
                 'file_name'     => $file_name,
                 'file_size'     => $file_size,
@@ -639,19 +659,19 @@ class FlController extends Controller
         $cf_fl_model->insert($data);
     }
 
-    function sil_childs($acr_child_file, $acr_file_id)
-    {
-        $cf_fl_model            = new Acr_files_childs();
-        $fl_model               = new Acr_files();
-        $acr_files_childs_sorgu = $cf_fl_model->where('file_name', $acr_child_file)->where('acr_file_id', $acr_file_id);
-        $sil                    = $acr_files_childs_sorgu->delete();
-        if ($cf_fl_model->where('acr_file_id', $acr_file_id)->count() == 0) {
-            $fl_model->where('id', $acr_file_id)->delete();
-        }
-        if ($sil) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
+    /* function sil_childs($acr_child_file, $acr_file_id)
+     {
+         $cf_fl_model            = new Acr_files_childs();
+         $fl_model               = new Acr_files();
+         $acr_files_childs_sorgu = $cf_fl_model->where('file_name', $acr_child_file)->where('acr_file_id', $acr_file_id);
+         $sil                    = $acr_files_childs_sorgu->delete();
+         if ($cf_fl_model->where('acr_file_id', $acr_file_id)->count() == 0) {
+             $fl_model->where('id', $acr_file_id)->delete();
+         }
+         if ($sil) {
+             return 1;
+         } else {
+             return 0;
+         }
+     }*/
 }

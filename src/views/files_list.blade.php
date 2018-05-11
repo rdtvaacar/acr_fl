@@ -28,4 +28,14 @@
         </tr>
     @endforeach
     </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="5" style="text-align: center;">{{$files->links()}}</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align: right;">
+            <a class="btn btn-xs btn-danger" href="/acr/fl/delete/all?acr_file_id={{$acr_file_id}}">Tüm Dosyaları Sil</a>
+        </td>
+    </tr>
+    </tfoot>
 </table>
