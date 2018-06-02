@@ -264,7 +264,10 @@ class FlController extends Controller
             }
         }
         $json_data .= "]";
-        return response()->json($json_data);
+        return response()->json([
+            'data' => $json_data,
+            'code' => 200
+        ]);
     }
 
     function css()
