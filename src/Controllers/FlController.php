@@ -13,6 +13,16 @@ use Response;
 
 class FlController extends Controller
 {
+    function file_data(Request $request)
+    {
+        $acr_files_model = new Acr_files_childs();
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        return response()->json([
+            'data' => $files,
+            'code' => 200
+        ]);
+    }
+
     function delete_id(Request $request)
     {
         $file_id     = $request->file_id;
@@ -23,8 +33,8 @@ class FlController extends Controller
         @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/med/' . $file->file_name));
         $child_model->where('id', $file_id)->where('user_id', Auth::user()->id)->delete();
         return response()->json([
-            'message'=>'Başarıyla Silindi',
-            'code'=>200
+            'message' => 'Başarıyla Silindi',
+            'code'    => 200
         ]);
     }
 
