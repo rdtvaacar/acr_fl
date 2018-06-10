@@ -13,7 +13,7 @@ use Response;
 
 class FlController extends Controller
 {
-    function file_data(Request $request)
+    function files_data(Request $request)
     {
         $acr_files_model = new Acr_files_childs();
         $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
