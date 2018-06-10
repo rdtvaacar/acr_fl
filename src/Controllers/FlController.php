@@ -16,6 +16,7 @@ class FlController extends Controller
     function files_data(Request $request)
     {
         $acr_files_model = new Acr_files_childs();
+        $acr_file_id     = $request->acr_file_id;
         $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
         return response()->json([
             'data' => $files,
