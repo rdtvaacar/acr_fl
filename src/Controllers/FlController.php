@@ -13,6 +13,21 @@ use Response;
 
 class FlController extends Controller
 {
+    function delete_id(Request $request)
+    {
+        $file_id     = $request->file_id;
+        $child_model = new Acr_files_childs();
+        $file        = $child_model->where('id', $file_id)->where('user_id', Auth::user()->id)->first();
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/thumbs/' . $file->file_name));
+        @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/med/' . $file->file_name));
+        $child_model->where('id', $file_id)->where('user_id', Auth::user()->id)->delete();
+        return response()->json([
+            'message'=>'Başarıyla Silindi',
+            'code'=>200
+        ]);
+    }
+
     function delete_all(Request $request)
     {
         $acr_file_id = $request->acr_file_id;
@@ -40,7 +55,8 @@ class FlController extends Controller
         $acr_file_id = $request->acr_file_id;
         $file        = $request->file('file');
         $this->acr_file_delete($acr_file_id);
-        return $this->file_create($file, $acr_file_id);
+        $file_create = $this->file_create($file, $acr_file_id);
+        return $file_create[1];
     }
 
     function config_update(Request $request)
@@ -247,25 +263,27 @@ class FlController extends Controller
         return $file_model->insertGetId(['updated_at' => date('Y-m-d')]);
     }
 
-    function upload(Request $request)
+    function upload(Request $request, $name_random = false)
     {
         $files       = $request->allFiles();
         $acr_file_id = $request->acr_file_id;
         $file_names  = [];
         foreach ($files as $file) {
-            $file_names[] = self::file_create($file, $acr_file_id);
+            $file_create                 = self::file_create($file, $acr_file_id, $name_random);
+            $file_names[$file_create[0]] = $file_create[1];
         }
-        $json_data = "[";
+        $ups = [];
         foreach ($file_names as $key => $file_name) {
-            $file_name = $file_name;
-            $json_data .= '"' . $file_name . '"';
-            if (count($file_names) > $key + 1) {
-                $json_data .= ",";
-            }
+            $ups[] = [
+                'thumb' => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/thumbs',
+                'zero'  => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/zero',
+                'id'    => $key
+            ];
+
         }
-        $json_data .= "]";
+
         return response()->json([
-            'data' => $json_data,
+            'data' => $ups,
             'code' => 200
         ]);
     }
@@ -300,7 +318,7 @@ class FlController extends Controller
         return view('Acr_flv::js', compact('data'))->render();
     }
 
-    function file_create($file, $acr_file_id)
+    function file_create($file, $acr_file_id, $name_random = false)
     {
         $config_model = new Config();
         $config       = $config_model->first();
@@ -313,7 +331,7 @@ class FlController extends Controller
             $file_name_dot   = $file->getClientOriginalName();
             $dot             = $file->getClientOriginalExtension();
             $file_name_org   = str_replace('.' . $dot, '', $file_name_dot);
-            $file_name       = self::ingilizceYap($file_name_org);
+            $file_name       = $name_random ? uniqid(rand(100000, 999999)) : self::ingilizceYap($file_name_org);
             $file_size       = $file->getClientSize();
             if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
@@ -423,9 +441,12 @@ class FlController extends Controller
                 'file_type'     => $dot,
                 'mime'          => $mime
             ];
-            $acr_files_model->insert($data_file);
+            $id        = $acr_files_model->insertGetId($data_file);
         }
-        return $file_name;
+        return [
+            $id,
+            $file_name
+        ];
     }
 
     function store_upload($file, $acr_file_id)
