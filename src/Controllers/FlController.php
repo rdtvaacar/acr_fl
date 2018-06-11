@@ -13,11 +13,11 @@ use Response;
 
 class FlController extends Controller
 {
-    function files_data(Request $request)
+    function files_data(Request $request, $acr_file_id = null)
     {
         $acr_files_model = new Acr_files_childs();
-        $acr_file_id     = $request->acr_file_id;
-        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        $acr_file_id     = empty($acr_file_id) ? $request->acr_file_id : $acr_file_id;
+        $files           = $acr_files_model->where('acr_file_id', $acr_file_id)->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
         return response()->json([
             'data' => $files,
             'code' => 200
