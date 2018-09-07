@@ -6,7 +6,6 @@
         <th>İŞLEM</th>
         <th>İSİM</th>
         <th>BOYUT</th>
-
     </tr>
     </thead>
     <tbody>

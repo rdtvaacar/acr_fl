@@ -280,15 +280,18 @@ class FlController extends Controller
         $acr_file_id = $request->acr_file_id;
         $file_names  = [];
         foreach ($files as $file) {
-            $file_create                 = self::file_create($file, $acr_file_id, $name_random);
-            $file_names[$file_create[0]] = $file_create[1];
+            $file_create                    = self::file_create($file, $acr_file_id, $name_random);
+            $file_names[$file_create[0]]    = $file_create[1];
+            $file_name_org[$file_create[0]] = $file_create[2];
         }
         $ups = [];
         foreach ($file_names as $key => $file_name) {
             $ups[] = [
-                'thumb' => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/thumbs',
-                'zero'  => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/zero',
-                'id'    => $key
+                'name_org' => $file_name_org[$key],
+                'name'     => $file_name,
+                'thumb'    => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/thumbs',
+                'zero'     => 'http://' . $request->getHost() . '/acr/fl/get_file/' . $acr_file_id . '/' . $file_name . '/zero',
+                'id'       => $key
             ];
 
         }
@@ -297,7 +300,9 @@ class FlController extends Controller
             'data' => $ups,
             'code' => 200
         ]);
+
     }
+
 
     function css()
     {
@@ -456,7 +461,8 @@ class FlController extends Controller
         }
         return [
             $id,
-            $file_name
+            $file_name,
+            $file_name_org
         ];
     }
 

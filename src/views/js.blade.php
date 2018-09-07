@@ -1,5 +1,5 @@
 <script>
-    function fl_new() {
+    function fl_new () {
         $('#fl_form').show();
     }
 
@@ -12,12 +12,12 @@
         $('.fl_form').on('submit', uploadFiles);
 
         // Grab the files and set them to our variable
-        function prepareUpload(event) {
+        function prepareUpload (event) {
             files = event.target.files;
         }
 
         // Catch the form submit and upload the files
-        function uploadFiles(event) {
+        function uploadFiles (event) {
             event.stopPropagation(); // Stop stuff happening
             event.preventDefault(); // Totally stop stuff happening
             // START A LOADING SPINNER HERE
@@ -29,7 +29,6 @@
             $.each(files, function (key, value) {
                     data.append(key, value);
                     console.log(data);
-
                     $.ajax({
                         url: '/acr/fl/upload',
                         type: 'POST',
@@ -54,9 +53,8 @@
                                 // submitForm(event, data);
 
                                 var items = [];
-                                $.each($.parseJSON(data), function (key, val) {
-                                    items.push("<li id='" + key + "'><div style='float: left'>" + val + "</div><div class='fl_complete'></div></li>");
-                                });
+                                var veri = $.parseJSON(JSON.stringify(data))
+                                items.push("<li><div style='float: left'><a href='" + veri.data[0].zero + "'>" + veri.data[0].name_org + "</a></div><div class='fl_complete'></div></li><div style='clear:both;'></div>");
                                 $("<ul/>", {
                                     "class": "lf_list",
                                     html: items.join("")
@@ -65,8 +63,8 @@
                             }
                             else {
                                 var items = [];
-                                $.each($.parseJSON(data), function (key, val) {
-                                    items.push("<li id='" + key + "'><div style='float: left'>" + val + "</div><div class='fl_error'></div></li>");
+                                $.each($.parseJSON(JSON.stringify(data)), function (key, val) {
+                                    items.push("<li id='" + key + "'><div style='float: left'>" + val.name + "</div><div class='fl_error'></div></li>");
                                 });
                                 $("<ul/>", {
                                     "class": "lf_list",
@@ -86,10 +84,9 @@
                 }
             );
 
-
         }
 
-        function submitForm(event, data) {
+        function submitForm (event, data) {
             // Create a jQuery object from the form
             $form = $(event.target);
 
@@ -127,7 +124,7 @@
         }
     });
 
-    function fl_file_delete(id) {
+    function fl_file_delete (id) {
         if (confirm('Silmek istediğinizden eminmisiniz?')) {
             $.ajax({
                 type: 'post',
@@ -141,7 +138,7 @@
         }
     }
 
-    function fl_download(id) {
+    function fl_download (id) {
         $.ajax({
             type: 'post',
             url: '/acr/fl/download',
