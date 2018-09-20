@@ -334,8 +334,14 @@ class FlController extends Controller
         return view('Acr_flv::js', compact('data'))->render();
     }
 
-    function file_create($file, $acr_file_id, $name_random = false)
+    function file_create($file, $acr_file_id, $name_random = false, $fl_id = null, $fl_path = null, $fl_thumbs = null, $fl_med = null)
     {
+        if (!empty($fl_id)) {
+            $old_file = Acr_files_childs::where('id', $fl_id)->first();
+            @unlink("$fl_path$acr_file_id/$fl_thumbs/$old_file->file_name.$old_file->file_type");
+            @unlink("$fl_path$acr_file_id/$fl_med/$old_file->file_name.$old_file->file_type");
+            @unlink("$fl_path$acr_file_id/$old_file->file_name.$old_file->file_type");
+        }
         $config_model = new Config();
         $config       = $config_model->first();
         if (!empty($file)) {
@@ -352,9 +358,9 @@ class FlController extends Controller
             if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name_dot)) {
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
-            $path   = storage_path() . '/app/public/acr_files/' . $acr_file_id . '/';
-            $thumbs = $path . 'thumbs/';
-            $med    = $path . 'med/';
+            $path   = empty($fl_path) ? storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' : $fl_path;
+            $thumbs = empty($fl_thumbs) ? $path . 'thumbs/' : $fl_thumbs;
+            $med    = empty($fl_med) ? $path . 'med/' : $fl_med;
             if (!is_dir(storage_path() . '/app/public/acr_files/')) {
                 mkdir(storage_path() . '/app/public/acr_files/');
             }
@@ -438,14 +444,21 @@ class FlController extends Controller
                         });
                     }
                 }
+
+
                 $img_thumbs->save($thumbs . $file_name . '.' . $dot);;
                 $img_med->save($med . $file_name . '.' . $dot);
                 $img->save($path . $file_name . '.' . $dot);
                 $file_name = $file_name . '.' . $dot;
 
             } else {
-                $file_name = self::store_upload($file, $acr_file_id);
-                $file_name = str_replace("acr_files/$acr_file_id/", '', $file_name);
+                if (empty($fl_id)) {
+                    $file_name = self::store_upload($file, $acr_file_id);
+                    $file_name = str_replace("acr_files/$acr_file_id/", '', $file_name);
+                } else {
+                    move_uploaded_file($file->getPathname(), "$path$acr_file_id/$file_name.$dot");
+                }
+
 
             }
             $data_file = [
@@ -457,7 +470,13 @@ class FlController extends Controller
                 'file_type'     => $dot,
                 'mime'          => $mime
             ];
-            $id        = $acr_files_model->insertGetId($data_file);
+            if (empty($fl_id)) {
+                $id = $acr_files_model->insertGetId($data_file);
+
+            } else {
+                $acr_files_model->where('id', $fl_id)->update($data_file);
+                $id = $fl_id;
+            }
         }
         return [
             $id,
