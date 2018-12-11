@@ -359,8 +359,8 @@ class FlController extends Controller
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
             $path   = empty($fl_path) ? storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' : $fl_path;
-            $thumbs = empty($fl_thumbs) ? $path . 'thumbs/' : $fl_thumbs;
-            $med    = empty($fl_med) ? $path . 'med/' : $fl_med;
+            $thumbs = empty($fl_thumbs) ? $path . 'thumbs/' : $path.$fl_thumbs;
+            $med    = empty($fl_med) ? $path . 'med/' : $path.$fl_med;
             if (!is_dir(storage_path() . '/app/public/acr_files/')) {
                 mkdir(storage_path() . '/app/public/acr_files/');
             }
@@ -449,7 +449,7 @@ class FlController extends Controller
                 $img_thumbs->save($thumbs . $file_name . '.' . $dot);;
                 $img_med->save($med . $file_name . '.' . $dot);
                 $img->save($path . $file_name . '.' . $dot);
-                $file_name = $file_name . '.' . $dot;
+                $file_name = $file_name;
 
             } else {
                 if (empty($fl_id)) {
