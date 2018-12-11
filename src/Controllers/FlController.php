@@ -359,8 +359,8 @@ class FlController extends Controller
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
             $path   = empty($fl_path) ? storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' : $fl_path;
-            $thumbs = empty($fl_thumbs) ? $path . 'thumbs/' : $path.$fl_thumbs;
-            $med    = empty($fl_med) ? $path . 'med/' : $path.$fl_med;
+            $thumbs = empty($fl_thumbs) ? $path . 'thumbs/' : $path . $fl_thumbs;
+            $med    = empty($fl_med) ? $path . 'med/' : $path . $fl_med;
             if (!is_dir(storage_path() . '/app/public/acr_files/')) {
                 mkdir(storage_path() . '/app/public/acr_files/');
             }
@@ -465,7 +465,7 @@ class FlController extends Controller
                 'acr_file_id'   => $acr_file_id,
                 'user_id'       => Auth::user()->id,
                 'file_name_org' => $file_name_org,
-                'file_name'     => $file_name,
+                'file_name'     => "$file_name.$dot",
                 'file_size'     => $file_size,
                 'file_type'     => $dot,
                 'mime'          => $mime
