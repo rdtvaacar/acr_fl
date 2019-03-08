@@ -680,6 +680,7 @@ class FlController extends Controller
 
         return $url;
     }
+
     function kaydet($acr_file_id, $session_id)
     {
         $fl_model = new Acr_files();
@@ -699,6 +700,7 @@ class FlController extends Controller
             return $acr_file_id;
         }
     }
+
     function acr_file_session($acr_file_id)
     {
         $fl_model = new Acr_files();
@@ -709,6 +711,7 @@ class FlController extends Controller
         } else
             return null;
     }
+
     function child_fields_create($data)
     {
         $cf_fl_model = new Acr_files_childs();

@@ -1,6 +1,7 @@
 <script>
-    function fl_new () {
+    function fl_new() {
         $('#fl_form').show();
+        $('#fl_list').hide();
     }
 
     $(function () {
@@ -12,12 +13,12 @@
         $('.fl_form').on('submit', uploadFiles);
 
         // Grab the files and set them to our variable
-        function prepareUpload (event) {
+        function prepareUpload(event) {
             files = event.target.files;
         }
 
         // Catch the form submit and upload the files
-        function uploadFiles (event) {
+        function uploadFiles(event) {
             event.stopPropagation(); // Stop stuff happening
             event.preventDefault(); // Totally stop stuff happening
             // START A LOADING SPINNER HERE
@@ -28,7 +29,6 @@
             @endforeach
             $.each(files, function (key, value) {
                     data.append(key, value);
-                    console.log(data);
                     $.ajax({
                         url: '/acr/fl/upload',
                         type: 'POST',
@@ -41,9 +41,10 @@
                             $('#fl_complete').hide();
                         },
                         complete: function () {
-                            $('#fl_loading').hide();
-                            $('#fl_complete').show();
-
+                            if (files.length == (key + 1)) {
+                                $('#fl_loading').hide();
+                                $('#fl_complete').show();
+                            }
                         },
                         processData: false, // Don't process the files
                         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
@@ -51,7 +52,6 @@
                             if (typeof data.error === 'undefined') {
                                 // Success so call function to process the form
                                 // submitForm(event, data);
-
                                 var items = [];
                                 var veri = $.parseJSON(JSON.stringify(data))
                                 items.push("<li><div style='float: left'><a href='" + veri.data[0].zero + "'>" + veri.data[0].name_org + "</a></div><div class='fl_complete'></div></li><div style='clear:both;'></div>");
@@ -71,12 +71,12 @@
                                     html: items.join("")
                                 }).appendTo(".fl_yuklenenler");
                                 $('.fl_yuklenenler').show();
-                                console.log('ERRORS: ' + data.error);
+                                // console.log('ERRORS: ' + data.error);
                             }
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             // Handle errors here
-                            console.log('ERRORS: ' + textStatus);
+                            // console.log('ERRORS: ' + textStatus);
                             // STOP LOADING SPINNER
                         }
                     });
@@ -86,66 +86,28 @@
 
         }
 
-        function submitForm (event, data) {
-            // Create a jQuery object from the form
-            $form = $(event.target);
-
-            // Serialize the form data
-            var formData = $form.serialize();
-
-            // You should sterilise the file names
-            $.each(data.files, function (key, value) {
-                formData = formData + '&filenames[]=' + value;
-            });
-            $.ajax({
-                url: 'submit.php',
-                type: 'POST',
-                data: formData,
-                cache: false,
-                dataType: 'json',
-                success: function (data, textStatus, jqXHR) {
-                    if (typeof data.error === 'undefined') {
-                        // Success so call function to process the form
-                        console.log('SUCCESS: ' + data.success);
+        function fl_file_delete(id) {
+            if (confirm('Silmek istediğinizden eminmisiniz?')) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/acr/fl/file/delete',
+                    data: 'id=' + id,
+                    success: function () {
+                        $('#fl_file_div_' + id).hide(400);
+                        $('#fl_file').show();
                     }
-                    else {
-                        // Handle errors here
-                        console.log('ERRORS: ' + data.error);
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    // Handle errors here
-                    console.log('ERRORS: ' + textStatus);
-                },
-                complete: function () {
-                    // STOP LOADING SPINNER
-                }
-            });
-        }
-    });
-
-    function fl_file_delete (id) {
-        if (confirm('Silmek istediğinizden eminmisiniz?')) {
-            $.ajax({
-                type: 'post',
-                url: '/acr/fl/file/delete',
-                data: 'id=' + id,
-                success: function () {
-                    $('#fl_file_div_' + id).hide(400);
-                    $('#fl_file').show();
-                }
-            });
-        }
-    }
-
-    function fl_download (id) {
-        $.ajax({
-            type: 'post',
-            url: '/acr/fl/download',
-            data: 'file_id=' + id,
-            success: function (url) {
-                window.open(url);
+                });
             }
-        });
-    }
+        }
+
+        function fl_download(id) {
+            $.ajax({
+                type: 'POST',
+                url: '/acr/fl/download',
+                data: 'file_id=' + id,
+                success: function (url) {
+                    window.open(url);
+                }
+            });
+        }
 </script>
