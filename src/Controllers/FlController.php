@@ -24,9 +24,9 @@ class FlController extends Controller
         ]);
     }
 
-    function delete_id(Request $request)
+    function delete_id(Request $request, $id = null)
     {
-        $file_id     = $request->file_id;
+        $file_id     = empty($id) ? $request->file_id : $id;
         $child_model = new Acr_files_childs();
         $file        = $child_model->where('id', $file_id)->where('user_id', Auth::user()->id)->first();
         @unlink(storage_path('app/public/acr_files/' . $file->acr_file_id . '/' . $file->file_name));
