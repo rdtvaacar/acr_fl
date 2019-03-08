@@ -1,8 +1,13 @@
 <form action="/acr/acr_fl/upload" class="fileinput-button fl_form" enctype="multipart/form-data" method="post">
     <div id="fl_loading" style="display: none" class="alert alert-danger">
         <div style="float: left"> Dosyalar yükleniyor lütfen bekleyiniz</div>
-        <div class="loading" style="width: 24px; height: 24px; float: left;"></div>
         <div style="clear:both;"></div>
+        <div class="progress">
+            <div
+                    class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                    role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            </div>
+        </div>
     </div>
     <div style="display: none;" id="fl_complete" class="alert alert-success">Dosyalar başarıyla yüklendi
         <div class="btn btn-xs btn-success" onclick="fl_new()">Yeni dosyalar Ekle</div>
