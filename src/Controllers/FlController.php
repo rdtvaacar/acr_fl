@@ -465,7 +465,7 @@ class FlController extends Controller
                 'acr_file_id'   => $acr_file_id,
                 'user_id'       => Auth::user()->id,
                 'file_name_org' => $file_name_org,
-                'file_name'     => "$file_name.$dot",
+                'file_name'     => "$file_name",
                 'file_size'     => $file_size,
                 'file_type'     => $dot,
                 'mime'          => $mime
