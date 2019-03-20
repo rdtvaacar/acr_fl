@@ -355,7 +355,7 @@ class FlController extends Controller
             $file_name_org   = str_replace('.' . $dot, '', $file_name_dot);
             $file_name       = $name_random ? uniqid(rand(100000, 999999)) : self::ingilizceYap($file_name_org);
             $file_size       = $file->getClientSize();
-            if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name. '.' . $dot)) {
+            if (file_exists(storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' . $file_name . '.' . $dot)) {
                 $file_name = $file_name . '_' . uniqid(rand(100000, 999999));
             }
             $path   = empty($fl_path) ? storage_path() . '/app/public/acr_files/' . $acr_file_id . '/' : $fl_path;
@@ -465,7 +465,7 @@ class FlController extends Controller
                 'acr_file_id'   => $acr_file_id,
                 'user_id'       => Auth::user()->id,
                 'file_name_org' => $file_name_org,
-                'file_name'     => "$file_name",
+                'file_name'     => "$file_name.$dot",
                 'file_size'     => $file_size,
                 'file_type'     => $dot,
                 'mime'          => $mime
@@ -480,7 +480,7 @@ class FlController extends Controller
         }
         return [
             $id,
-            $file_name,
+            $file_name . ".$dot",
             $file_name_org
         ];
     }
